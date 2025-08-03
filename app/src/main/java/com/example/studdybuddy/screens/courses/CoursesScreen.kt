@@ -35,11 +35,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.app.viewmodel.CourseViewModel
 import com.example.studdybuddy.navigation.Screen
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import com.example.studdybuddy.data.local.entity.CourseEntity
+import androidx.compose.foundation.lazy.items
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoursesScreen(navController: NavHostController) {
+fun CoursesScreen(
+    navController: NavHostController,
+    viewModel: CourseViewModel
+) {
+    val courses by viewModel.allCourses.collectAsState()
     Scaffold(
         modifier = Modifier.padding( 16.dp),
         topBar = {
@@ -64,21 +74,28 @@ fun CoursesScreen(navController: NavHostController) {
             }
         }
     ) {padding ->
+        if (courses.isEmpty()) {
+            Box(modifier = Modifier
+                .fillMaxSize()
+                .padding(padding),
+                contentAlignment = Alignment.Center
+            ) {
+                Text("No courses added yet.")
+            }
+        } else {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
-            item {
-                CourseItem("EG5307- Mobile Technologies")
-            }
-            item {
-                CourseItem("Second Item in list")
+            items(courses) { course ->
+                CourseItem(course=course)
             }
         }
+            }
     }
 }
 
 @Composable
-fun CourseItem(label: String) {
+fun CourseItem(course: CourseEntity) {
     ElevatedCard(
         modifier = Modifier
             .height(82.dp)
@@ -109,7 +126,7 @@ fun CourseItem(label: String) {
             verticalArrangement = Arrangement.Center // Distributes items vertically
         ) {
             Text(
-                text = label,
+                text = course.name,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 modifier = Modifier.padding(bottom = 5.dp)

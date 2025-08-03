@@ -1,10 +1,9 @@
 package com.example.app.feature.course
 
 import android.app.DatePickerDialog
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
@@ -14,28 +13,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.graphics.Color
+import com.example.app.viewmodel.CourseViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
-@Composable
 @OptIn(ExperimentalMaterial3Api::class)
-fun AddCourseScreen(navController: NavHostController) {
+@Composable
+fun AddCourseScreen(
+    navController: NavHostController,
+    viewModel: CourseViewModel
+) {
     val context = LocalContext.current
     val dateFormatter = remember { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
 
     var courseName by remember { mutableStateOf("") }
-    val courseList = remember { mutableStateListOf<String>() }
     var startDate by remember { mutableStateOf("") }
     var endDate by remember { mutableStateOf("") }
 
-    fun showDatePicker(onDateSelected: (String) -> Unit) {
+    fun openDatePicker(onDateSelected: (String) -> Unit) {
         val calendar = Calendar.getInstance()
         DatePickerDialog(
             context,
-            { _, year, month, dayOfMonth ->
-                val selectedDate = Calendar.getInstance()
-                selectedDate.set(year, month, dayOfMonth)
-                onDateSelected(dateFormatter.format(selectedDate.time))
+            { _, year, month, day ->
+                calendar.set(year, month, day)
+                onDateSelected(dateFormatter.format(calendar.time))
             },
             calendar.get(Calendar.YEAR),
             calendar.get(Calendar.MONTH),
@@ -62,7 +65,8 @@ fun AddCourseScreen(navController: NavHostController) {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp, vertical = 20.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             OutlinedTextField(
                 value = courseName,
@@ -71,37 +75,44 @@ fun AddCourseScreen(navController: NavHostController) {
                 modifier = Modifier.fillMaxWidth()
             )
 
-            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = { openDatePicker { startDate = it } },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(8.dp), // Creates rounded corners with an 8dp radius
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Black),
+                border = BorderStroke(width = 1.dp, color = Color.Gray)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(if (startDate.isBlank()) "Select Start Date" else "Start Date: $startDate")
+                }
+            }
 
-            OutlinedTextField(
-                value = startDate,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Start Date") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDatePicker { startDate = it } }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            OutlinedTextField(
-                value = endDate,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("End Date") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDatePicker { endDate = it } }
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
+            Button(
+                onClick = { openDatePicker { endDate = it } },
+                modifier = Modifier.fillMaxWidth().height(56.dp),
+                shape = RoundedCornerShape(8.dp), // Creates rounded corners with an 8dp radius
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent, contentColor = Color.Black),
+                border = BorderStroke(width = 1.dp, color = Color.Gray)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.CenterStart
+                ) {
+                    Text(if (endDate.isBlank()) "Select End Date" else "End Date: $endDate")
+                }
+            }
 
             Button(
                 onClick = {
-                    if (courseName.isNotBlank()) {
-                        courseList.add(courseName)
-                        courseName = ""
+                    if (courseName.isNotBlank() && startDate.isNotBlank() && endDate.isNotBlank()) {
+                        viewModel.addCourse(courseName, startDate, endDate)
+                        Toast.makeText(context, "Course added successfully!", Toast.LENGTH_SHORT).show()
+                        navController.navigateUp()
+                    } else {
+                        Toast.makeText(context, "Please fill all fields.", Toast.LENGTH_SHORT).show()
                     }
                 },
                 modifier = Modifier.align(Alignment.End)
