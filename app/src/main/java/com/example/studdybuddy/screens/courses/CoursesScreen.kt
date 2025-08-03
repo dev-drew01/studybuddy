@@ -13,6 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -21,6 +25,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,16 +34,38 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
+import com.example.studdybuddy.navigation.Screen
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CoursesScreen() {
+fun CoursesScreen(navController: NavHostController) {
     Scaffold(
-        containerColor = Color.Green
-    ) {
+        modifier = Modifier.padding( 16.dp),
+        topBar = {
+            TopAppBar(
+                title = { Text(
+                    text="Courses",
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 36.sp,
+                    color = Color(0XFF003F5F)
+                ) },
+                navigationIcon = {
+                },
+                actions = {
+                }
+            )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = {
+                 navController.navigate(Screen.AddCourse.route)
+            }) {
+                Icon(Icons.Filled.Add, "Floating action button.")
+            }
+        }
+    ) {padding ->
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.padding(horizontal = 16.dp),
         ) {
             item {
                 CourseItem("EG5307- Mobile Technologies")

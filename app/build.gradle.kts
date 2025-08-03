@@ -49,8 +49,11 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.material)
-    implementation("androidx.navigation:navigation-compose:2.9.2")
-    implementation("androidx.compose.ui:ui:1.5.0")
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.ui)
+    implementation(libs.androidx.ui.text.google.fonts)
+    implementation ("io.github.ehsannarmani:compose-charts:0.1.7")
+// Use the latest version
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
