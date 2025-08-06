@@ -1,8 +1,6 @@
 package com.example.app.feature.home
 
-import android.annotation.SuppressLint
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.FloatingActionButton
@@ -47,11 +44,10 @@ import androidx.compose.foundation.lazy.items
 @Composable
 fun CoursesScreen(
     navController: NavHostController,
-    viewModel: CourseViewModel
+    viewModel: CourseViewModel,
 ) {
     val courses by viewModel.allCourses.collectAsState()
     Scaffold(
-        modifier = Modifier.padding( 16.dp),
         topBar = {
             TopAppBar(
                 title = { Text(
@@ -85,9 +81,17 @@ fun CoursesScreen(
         } else {
         LazyColumn(
             verticalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(
+                    horizontal = 16.dp,
+                )
         ) {
             items(courses) { course ->
-                CourseItem(course=course)
+                CourseItem(course=course) {
+                    navController.navigate("${Screen.CourseCalendar.route}/${course.id}")
+                }
             }
         }
             }
@@ -95,28 +99,18 @@ fun CoursesScreen(
 }
 
 @Composable
-fun CourseItem(course: CourseEntity) {
+fun CourseItem(course: CourseEntity, onClick: () -> Unit) {
     ElevatedCard(
         modifier = Modifier
             .height(82.dp)
-//            .border(2.dp, Color.DarkGray)
             .fillMaxWidth()
-        ,
+            .clickable() { onClick() },
         colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(size = 16.dp), // Set all corners to 16.dp radius
         elevation = CardDefaults.elevatedCardElevation(
             defaultElevation = 2.dp // Adjust the elevation as needed
         ),
-//        verticalArrangement = Arrangement.SpaceAround // Distributes items vertically
     ) {
-//        Box(
-//            modifier = Modifier
-//                .fillMaxHeight()
-//                .width(20.dp)
-//                .background(color = Color.Red) // Sets a solid red background
-//            ,
-//        ) {}
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()

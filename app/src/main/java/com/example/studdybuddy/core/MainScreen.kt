@@ -18,19 +18,22 @@ import com.example.app.viewmodel.CourseViewModel
 import com.example.studdybuddy.navigation.Screen
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.app.repository.CourseRepository
+import com.example.app.feature.course.CourseCalendarScreen
+import com.example.app.feature.profile.ProfileScreen
 import com.example.app.viewmodel.CourseViewModelFactory
 import com.example.studdybuddy.data.local.database.AppDatabase
 
 @Composable
-fun MainScreen(navController: NavController) {
+fun MainScreen(navController: NavHostController) {
     // Inner navController for navigating between Home/Profile
     val context = LocalContext.current
-    val dao = AppDatabase.getInstance(context).courseDao()
-    val repository = CourseRepository(dao)
+    val courseDao = AppDatabase.getInstance(context).courseDao()
+    val taskDao = AppDatabase.getInstance(context).taskDao()
+    val repository = CourseRepository(courseDao, taskDao)
     val factory = CourseViewModelFactory(repository)
+    val courseViewModel: CourseViewModel = viewModel(factory = factory)
 
     val bottomNavController: NavHostController = rememberNavController()
-    val courseViewModel: CourseViewModel = viewModel(factory = factory)
 
     Scaffold(
         bottomBar = {
@@ -46,11 +49,10 @@ fun MainScreen(navController: NavController) {
                 HomeScreen()
             }
             composable(Screen.Courses.route) {
-                CoursesScreen(navController = bottomNavController, viewModel= courseViewModel)
+                CoursesScreen(navController = navController, viewModel= courseViewModel)
             }
-            composable(Screen.AddCourse.route) {
-                AddCourseScreen(navController = bottomNavController, viewModel = courseViewModel)
-
+            composable(Screen.Profile.route) {
+                ProfileScreen(navController = navController,)
             }
         }
     }

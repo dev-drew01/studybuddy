@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.app.repository.CourseRepository
 import com.example.studdybuddy.data.local.entity.CourseEntity
+import com.example.studdybuddy.data.local.entity.TaskEntity
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -21,10 +23,29 @@ class CourseViewModel(
         }
     }
 
+    fun insertTask(task: TaskEntity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.insertTask(task)
+        }
+    }
+
+    fun insertTasks(tasks: List<TaskEntity>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.insertTasks(tasks)
+        }
+    }
+
     val allCourses: StateFlow<List<CourseEntity>> =
         repository.allCourses.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),
             initialValue = emptyList<CourseEntity>()
+        )
+
+    val allTasks = repository.getAllTasks()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
         )
 }

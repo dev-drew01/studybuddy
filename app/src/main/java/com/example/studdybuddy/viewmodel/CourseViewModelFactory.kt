@@ -10,6 +10,7 @@ class CourseViewModelFactory(
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(CourseViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
             return CourseViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
